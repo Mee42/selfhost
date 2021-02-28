@@ -4,7 +4,7 @@
 filename = js "process.argv[2]";
 
 preprocess =
-#include res/compiler/preprocessor.selfhost
+#include res/preprocessor.selfhost
 
 print (preprocess filename)
 

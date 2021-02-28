@@ -95,7 +95,7 @@ fun runCaptureSTDOUT(str: String, firstArgument: String) : String {
     val logFile = File("/tmp/selfhost/" + { ('a'..'z').random()}.repeat(25).joinToString("") { "" + it() } + ".output")
     file.parentFile.mkdir()
     PrintStream(FileOutputStream(file)).use { it.print(str) }
-    ProcessBuilder("node", file.absolutePath, firstArgument).redirectErrorStream(true).redirectOutput(logFile).start().waitFor()
+    ProcessBuilder("node", "--stack-size=1280000", file.absolutePath, firstArgument).redirectErrorStream(true).redirectOutput(logFile).start().waitFor()
     return logFile.readText()
 }
 

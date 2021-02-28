@@ -34,8 +34,8 @@ includedIn = { not (eq (indexOf $0 $1) (- 0 1) ) };
 letters = "abcdefghijklmnopqrstuvwxyz";
 uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 numbers = "0123456789";
-identifierStarterCharset = + (+ letters uppercase) "+-/\\<>.,%q=_$";
-identifierBodyCharset = + (+ identifierStarterCharset "!?" numbers);
+identifierStarterCharset = + (+ letters uppercase) "+-/\\<>.,%q=_$$$";
+identifierBodyCharset = + (+ identifierStarterCharset "!?$") numbers;
 
 # takes in string as $0
 # returns a list, where each element is a list, where the first element is the type and the second is the content
@@ -47,6 +47,8 @@ lex = {
     rest = substring input 1;
     !when first
       { eq $0 " " } { lex rest }
+      { eq $0 CHARS_newline } { lex rest}
+      { eq $0 "\t" } { lex rest }
       { eq $0 "(" } { ++ (list (list "LPAREN" "(")) (lex rest) }
       { eq $0 ")" } { ++ (list (list "RPAREN" ")")) (lex rest) }
       { eq $0 "{" } { ++ (list (list "LBRACE" "{")) (lex rest) }
@@ -74,11 +76,7 @@ lex = {
     }
 };
 
-str = + (+ (+ (+ "1 2 3 456 7 89 helo world!!! 3world  " CHARS_quote) "hello, this is inside a string") CHARS_quote) "outside";
 
-print (lex str);
-
-
-
+lex;
 
 }

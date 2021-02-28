@@ -28,11 +28,11 @@ class ParserTests {
     }
     @Test
     fun closures() {
-        assertEquals(Expr.FiniteExpr.Closure(true, listOf()), parse(lex("{}")))
-        assertEquals(Expr.FiniteExpr.Closure(false, listOf()), parse(lex("?{}")))
-        assertEquals(Expr.FiniteExpr.Closure(true, listOf(Expr.FiniteExpr.Unit)), parse(lex("{()}")))
+        assertEquals(Expr.FiniteExpr.Closure(listOf()), parse(lex("{}")))
+        assertEquals(Expr.FiniteExpr.Closure(listOf()), parse(lex("?{}")))
+        assertEquals(Expr.FiniteExpr.Closure(listOf(Expr.FiniteExpr.Unit)), parse(lex("{()}")))
         assertEquals(
-            Expr.FiniteExpr.Closure(true, 
+            Expr.FiniteExpr.Closure(
                 listOf(Expr.Application(
                     listOf(Expr.FiniteExpr.Variable("print"), 
                         Expr.FiniteExpr.StringLiteral("Hello, World!"))))),
@@ -45,7 +45,7 @@ class ParserTests {
         assertEquals(Expr.Set("a", Expr.FiniteExpr.IntLiteral(7)), parse(lex("a = 7")))
         
         
-        val expr = Expr.FiniteExpr.Closure(true, listOf(
+        val expr = Expr.FiniteExpr.Closure(listOf(
             Expr.Set("a", Expr.FiniteExpr.IntLiteral(7)),
             Expr.Set("b", Expr.FiniteExpr.IntLiteral(8)),
             Expr.Set("c",Expr.Application(listOf(

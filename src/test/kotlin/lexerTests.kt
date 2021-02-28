@@ -25,7 +25,7 @@ class LexerTests {
     }
     @Test
     fun specialChars() {
-        assertEquals(listOf(LPAREN, RPAREN, LBRACE, RBRACE, QUESTION_MARK, EXCLAMATION_MARK),
-            lex("(){}?!").map { it.type })
+        assertEquals(listOf(LPAREN, RPAREN, LBRACE, RBRACE, EXCLAMATION_MARK),
+            lex("(){}!").map { it.type })
     }
 }

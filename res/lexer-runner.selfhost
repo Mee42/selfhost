@@ -1,0 +1,14 @@
+!{
+
+
+filename = js "process.argv[2]";
+;
+preprocess =
+#include res/preprocessor.selfhost
+;
+lex =
+#include res/lexer.selfhost
+;
+print (lex (preprocess filename));
+
+}
