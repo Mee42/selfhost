@@ -1,0 +1,39 @@
+;;;
+
+
+# loop a given number of times
+# $0 - starting value
+# $1 - ending value, exclusive
+# $2 - function to run, value is passed as $0
+
+loop = {
+    start = $0;
+    end = $1;
+    f = $2;
+    f start;
+    newStart = (+ start 1);
+    !if (eq newStart end) {} { loop newStart end f }
+};
+
+# loop until we get a value we want to keep
+# $0 - starting value
+# $1 - function to map the starting value to a new value
+# $2 - a function that takes in the iterating value, returns () if we want to continue
+
+loopTilValue = {
+    startingValue = $0;
+    iteratorF = $1;
+    bodyF = $2;
+    result = bodyF startingValue;
+    !if (eq result ()) { loopTilValue (iteratorF startingValue) iteratorF bodyF } { result };
+};
+
+
+# use a function as infix
+# syntax:
+# (inf A B C) => (B A C)
+infx = { $1 $0 $2 };
+
+
+;;;
+

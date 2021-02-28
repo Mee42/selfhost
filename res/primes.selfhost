@@ -1,0 +1,24 @@
+# this means it's a final program, not meant to be included
+!{
+
+#include res/stdlib.selfhost
+
+isPrime = {
+   value = $0;
+    loopTilValue 2 { + $0 1 } {
+       testingFactor = $0;
+       !if (eq testingFactor value) {
+           true
+       } {
+           isDivisible = eq (% value testingFactor) 0;
+           if (isDivisible) false ()
+       }
+    }
+};
+
+loop 2 100 {
+    x = $0;
+    !if (isPrime x) { print x } { };
+};
+
+}
