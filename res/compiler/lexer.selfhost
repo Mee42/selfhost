@@ -1,0 +1,84 @@
+!{
+#include res/stdlib.selfhost
+
+input = "abc ABC a1 B1 a753+- - -7 ===";
+
+# $0 a value
+# $1 a function
+# $2 a value to use, if ($1 $0) returns true
+# $3... the rest of the arguments, to be used recursively
+
+
+# when foo
+#    {eq $0 1}  "one"
+#    {eq $0 2}  "two"
+#    {true}     "something else"
+
+# there is always assumed to be at least 3 arguments, the last function must always match or it will break
+when = {
+#    print "when" $N;
+    value = $0;
+    conditional = $1;
+    resultIfConditionalValue = $2;
+    allArgs = $N;
+    !if (conditional value) { resultIfConditionalValue } {
+        # if not, then we repeat
+        arguments = ++ (list value) (slice allArgs 3);
+        call when arguments;
+    }
+};
+
+
+includedIn = { not (eq (indexOf $0 $1) (- 0 1) ) };
+
+letters = "abcdefghijklmnopqrstuvwxyz";
+uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+numbers = "0123456789";
+identifierStarterCharset = + (+ letters uppercase) "+-/\\<>.,%q=_$";
+identifierBodyCharset = + (+ identifierStarterCharset "!?" numbers);
+
+# takes in string as $0
+# returns a list, where each element is a list, where the first element is the type and the second is the content
+lex = {
+    input = $0;
+    !if (eq input "") { !list }
+    { # if input isn't empty
+    first = substring input 0 1;
+    rest = substring input 1;
+    !when first
+      { eq $0 " " } { lex rest }
+      { eq $0 "(" } { ++ (list (list "LPAREN" "(")) (lex rest) }
+      { eq $0 ")" } { ++ (list (list "RPAREN" ")")) (lex rest) }
+      { eq $0 "{" } { ++ (list (list "LBRACE" "{")) (lex rest) }
+      { eq $0 "}" } { ++ (list (list "RBRACE" "}")) (lex rest) }
+      { eq $0 ";" } { ++ (list (list "SEMICOLON" ";")) (lex rest) }
+      { eq $0 "!" } { ++ (list (list "EXCLAMATION_MARK" "!")) (lex rest) }
+      { eq $0 "?" } { ++ (list (list "QUESTION_MARK" "?")) (lex rest) }
+      { includedIn numbers $0 } {
+          # if it in 0..9
+          x = indexOfFirstOrElse rest { not (includedIn numbers $0) } (length rest);
+          int = + (+ "" first) (substring rest 0 x);
+          ++ (list (list "INTEGER_LITERAL" int)) (lex (substring rest x));
+      }
+      { includedIn identifierStarterCharset $0 } {
+         x = indexOfFirstOrElse rest { not (includedIn identifierBodyCharset $0) } (length rest);
+         ident = + (+ "" first) (substring rest 0 x);
+         ++ (list (list "IDENTIFIER" ident)) (lex (substring rest x));
+      }
+      { eq $0 CHARS_quote } {
+         x = indexOfFirstOrElse rest { eq CHARS_quote $0 } (length rest);
+         stringValue = substring rest 0 x;
+         ++ (list (list "STRING_LITERAL" stringValue)) (lex (substring rest (+ x 1)));
+      }
+      { true } { list (list "ERROR!!!!! UNKNOWN" (+ first rest)) }
+    }
+};
+
+str = + (+ (+ (+ "1 2 3 456 7 89 helo world!!! 3world  " CHARS_quote) "hello, this is inside a string") CHARS_quote) "outside";
+
+print (lex str);
+
+
+
+
+}

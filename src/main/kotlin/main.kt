@@ -23,7 +23,7 @@ import java.util.*
 //   $N   the list of all arguments
 
 fun main() {
-    run(compile(parse(lex(preprocess(File("res/primes.selfhost").readText())))))
+    run(compile(parse(lex(preprocess(File("res/compiler/lexer.selfhost").readText())))))
 }
 
 fun repl() {

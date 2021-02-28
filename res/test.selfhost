@@ -1,0 +1,6 @@
+!{
+
+
+    print (readFile "res/test.selfhost")
+
+}

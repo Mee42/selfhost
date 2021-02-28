@@ -8,7 +8,7 @@ sealed class JS {
     data class Variable(val identifier: Identifier): JS()
     object Null: JS()
     data class Set(val variable: Identifier, val value: JS): JS()
-    data class Closure(val captureArg: Boolean, val body: List<JS>): JS()
+    data class Closure(val body: List<JS>): JS()
     data class Call(val function: JS, val arguments: List<JS>): JS()
 }
 
@@ -21,7 +21,7 @@ private fun Expr.toJS(): JS = when(this){
         val newIdent = identifier.replace("arr", "_arr_")
         JS.Variable(newIdent)
     }
-    is Expr.FiniteExpr.Closure -> JS.Closure(hasArgs, body.map(Expr::toJS))
+    is Expr.FiniteExpr.Closure -> JS.Closure(body.map(Expr::toJS))
     is Expr.FiniteExpr.StringLiteral -> JS.StringLiteral(value) 
     is Expr.FiniteExpr.IntLiteral -> JS.IntLiteral(value)
 }
@@ -52,6 +52,7 @@ fun mangleVariableName(str: Identifier, `allow$`: Boolean = true): String {
         "/" -> "std_div"
         "%" -> "std_mod"
         "if" -> "std_if"
+        "++" -> "std_concat"
         "true" -> "std_true"
         "false" -> "std_false"
         else -> str.replace("arr", "_arr_")
@@ -65,7 +66,7 @@ private fun compile(js: JS, needsParens: Boolean): String = when(js) {
     JS.Null -> "null"
     is JS.Set -> "const " + mangleVariableName(js.variable, `allow$` = false)+ " = " + compile(js.value, false)
     is JS.Closure -> {
-        var s = ((if (js.captureArg) "(...arr) => { " else "() => {"))
+        var s = ((if (true) "(...arr) => { " else "() => {"))
         for((i, child) in js.body.withIndex()) {
             if(i == js.body.lastIndex && child !is JS.Set) {
                 s += "return " + compile(child, true)
@@ -89,6 +90,14 @@ fun run(str: String) {
     ProcessBuilder("node", file.absolutePath).inheritIO().start().waitFor()
 }
 
+fun runCaptureSTDOUT(str: String, firstArgument: String) : String {
+    val file = File("/tmp/selfhost/" + { ('a'..'z').random()}.repeat(25).joinToString("") { "" + it() } + ".js")
+    val logFile = File("/tmp/selfhost/" + { ('a'..'z').random()}.repeat(25).joinToString("") { "" + it() } + ".output")
+    file.parentFile.mkdir()
+    PrintStream(FileOutputStream(file)).use { it.print(str) }
+    ProcessBuilder("node", file.absolutePath, firstArgument).redirectErrorStream(true).redirectOutput(logFile).start().waitFor()
+    return logFile.readText()
+}
 
 fun <T> T.repeat(n: Int): List<T> {
     val x = mutableListOf<T>()

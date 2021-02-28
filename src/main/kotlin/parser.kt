@@ -13,7 +13,7 @@ sealed class Expr {
     sealed class FiniteExpr: Expr() {
         object Unit: FiniteExpr()
         data class Variable(val identifier: Identifier): FiniteExpr()
-        data class Closure(val hasArgs: Boolean, val body: List<Expr>): FiniteExpr()
+        data class Closure(val body: List<Expr>): FiniteExpr()
         data class StringLiteral(val value: String): FiniteExpr()
         data class IntLiteral(val value: Int): FiniteExpr()
     }
@@ -78,19 +78,10 @@ private fun parseFiniteExpr(tokens: ArrayDeque<Token>): Expr {
                 while(tokens.first().type == TokenType.SEMICOLON) tokens.removeFirst()
             }
             tokens.removeFirst().assertType(TokenType.RBRACE)
-            FiniteExpr.Closure(true, lines)
+            FiniteExpr.Closure(lines)
         }
         TokenType.RBRACE -> error("Not expecting lparen here")
-        TokenType.QUESTION_MARK -> { // better be a fucking closure
-            val lines = mutableListOf<Expr>()
-            tokens.removeFirst().assertType(TokenType.LBRACE)
-            while(tokens.first().type  != TokenType.RBRACE) {
-                while(tokens.first().type == TokenType.SEMICOLON) tokens.removeFirst()
-                lines += parseExpr(tokens)
-                while(tokens.first().type == TokenType.SEMICOLON) tokens.removeFirst()
-            }
-            FiniteExpr.Closure(false, lines)
-        }
+
         TokenType.EXCLAMATION_MARK -> error("can't use ! in finite expressions")
         TokenType.SEMICOLON -> error("can't use ; in finite expressions")
     }

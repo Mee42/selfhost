@@ -1,12 +1,11 @@
 
 
 enum class TokenType {
-    IDENTIFIER, //
+    IDENTIFIER,
     LPAREN,
     RPAREN,
     RBRACE,
     LBRACE,
-    QUESTION_MARK,
     EXCLAMATION_MARK,
     SEMICOLON,
     INTEGER_LITERAL,
@@ -15,7 +14,7 @@ enum class TokenType {
 class Token(val type: TokenType, val content: String)
 
 const val letters = "abcdefghijklmnopqrstuvwxyz"
-val identifierStarterCharset = letters + letters.toUpperCase() + "+-/\\><.,%'=$"
+val identifierStarterCharset = letters + letters.toUpperCase() + "+-/\\><.,%'=_$"
 val identifierBodyCharset = "$identifierStarterCharset!?0123456789"
 
 fun lex(str: String): List<Token> {
@@ -30,7 +29,6 @@ fun lex(str: String): List<Token> {
         '}' -> listOf(Token(TokenType.RBRACE, "}")) + lex(rest)
         ';' -> listOf(Token(TokenType.SEMICOLON, ";")) + lex(rest)
         '!' -> listOf(Token(TokenType.EXCLAMATION_MARK, "!")) + lex(rest)
-        '?' -> listOf(Token(TokenType.QUESTION_MARK, "?")) + lex(rest)
         in '0'..'9' -> {
             val x = rest.indexOfFirstOrNull { it !in '0'..'9' } ?: rest.length
             val int = first + rest.substring(0, x)

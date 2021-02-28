@@ -10,9 +10,7 @@ fun preprocess(input: String): String {
                 println("reading from file $file")
                 if(line.isNotBlank()) error("can't #include on a line with content")
                 return@map preprocess(file.readText())
-            }
-            return@map line
-        }
-        return@map it
-    }.joinToString("","","")
+            } else line
+        } else it
+    }.joinToString("\n","","")
 }

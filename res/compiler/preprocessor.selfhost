@@ -1,0 +1,38 @@
+!{
+
+# testing, testing
+#include res/stdlib.selfhost
+
+
+
+
+# filename is $0
+# returns string which is the processed version
+preprocess = {
+    filename = $0;
+    ret = map (split_string (readFile filename) CHARS_newline ()) {
+        fullLine = $0;
+        !if (eq (indexOf fullLine CHARS_hash) -1)
+        { # if there's no comment
+            fullLine; # just use the line lel
+        }
+        { # if there's a comment character
+            splitLine = split_string fullLine CHARS_hash 1;
+            line = infx splitLine get 0;
+            comment = infx splitLine get 1;
+            !if (eq (substring comment 0 (length "include")) "include")
+            { # if it starts with include
+                filename = substring comment (length "include ");
+                preprocess filename;
+            }
+            { # otherwise, just use the line
+                line;
+            }
+        }
+    };
+    reduceWithStarter ret "" {+ $0 (+ CHARS_newline $1)};
+};
+
+preprocess;
+
+};
